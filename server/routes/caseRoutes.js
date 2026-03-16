@@ -21,4 +21,3 @@ router.put('/:id', protect, updateCase);
 router.delete('/:id', protect, deleteCase);
 
 module.exports = router;
-

@@ -6,5 +6,5 @@ const router = express.Router();
 
 router.get('/stats', protect, getDashboardStats);
 
-module.exports = router;
 
+module.exports = router;
