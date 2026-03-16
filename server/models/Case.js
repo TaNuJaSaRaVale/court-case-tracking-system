@@ -47,4 +47,3 @@ const caseSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('Case', caseSchema);
-
