@@ -1,28 +1,33 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+
+const connectDB = require('./config/db');
 
 dotenv.config();
 
+connectDB();
+
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("Court Case Tracker API is running...");
+app.get('/', (req, res) => {
+  return res.send('API running');
 });
 
-// Connect MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
+const authRoutes = require('./routes/authRoutes');
+const caseRoutes = require('./routes/caseRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+
+app.use('/api/auth', authRoutes);
+app.use('/api/cases', caseRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+
+app.use((req, res) => {
+  return res.status(404).json({ message: 'Route not found' });
+});
 
 const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
