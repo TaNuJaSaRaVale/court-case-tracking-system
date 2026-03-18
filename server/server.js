@@ -21,6 +21,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cases', caseRoutes);
+
 app.use('/api/dashboard', dashboardRoutes);
 
 app.use((req, res) => {
