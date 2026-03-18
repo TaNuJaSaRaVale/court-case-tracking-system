@@ -5,24 +5,7 @@ export default function LandingPage() {
     <div>
       <div className="pb-16">
         <div className="m-1 w-full flex gap-2">
-          <nav className="flex items-center gap-2 justify-between w-full">
-            {/* Left Side */}
-            <div>
-              <Link to={"/"} className="flex items-center gap-2">
-                <img src={court} alt="Logo" className="w-10 h-10 bg-blue-700 border-[1px] rounded-3xl"/>
-                <h3 className="text-[rgb(0,0,128)]">NyaySetu</h3>
-              </Link>
-            </div>
-            {/* Right Side */}
-            <div className="flex items-center gap-3 m-4">
-              <Link to={"/login"}>
-                <button>Login</button>
-              </Link>
-              <Link to={"/register"}>
-                <button>Register</button>
-              </Link>
-            </div>
-          </nav>
+          
         </div>
         <hr></hr>
         <main className="min-h-[70vh] w-full bg-[#08108a] flex flex-col justify-center items-center gap-4 px-4 text-center">
