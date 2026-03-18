@@ -1,16 +1,18 @@
 const Case = require('../models/Case');
 
-const getDashboardStats = async (req, res) => {
+const getDashboard = async (req, res) => {
   try {
     const now = new Date();
+    const baseQuery = { user: req.user._id };
 
     const [totalCases, openCases, closedCases, upcomingHearings] =
       await Promise.all([
-        Case.countDocuments({}),
-        Case.countDocuments({ status: 'Open' }),
-        Case.countDocuments({ status: 'Closed' }),
+        Case.countDocuments(baseQuery),
+        Case.countDocuments({ ...baseQuery, status: { $ne: 'Closed' } }),
+        Case.countDocuments({ ...baseQuery, status: 'Closed' }),
         Case.countDocuments({
-          status: { $in: ['Open', 'Pending'] },
+          ...baseQuery,
+          status: { $in: ['Hearing Scheduled', 'In Progress'] },
           nextHearingDate: { $gte: now },
         }),
       ]);
@@ -26,4 +28,4 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
-module.exports = { getDashboardStats };
+module.exports = { getDashboard };

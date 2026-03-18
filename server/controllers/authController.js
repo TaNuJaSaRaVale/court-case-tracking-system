@@ -1,9 +1,27 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const normalizeRole = (roleValue) => {
+  const raw = String(roleValue || '').trim().toLowerCase();
+
+  if (!raw) return 'user';
+
+  // Support legacy role values from earlier iterations
+  if (raw === 'admin') return 'admin';
+  if (raw === 'lawyer') return 'lawyer';
+  if (raw === 'clerk') return 'user';
+
+  // Support capitalized legacy inputs
+  if (raw === 'administrator') return 'admin';
+
+  if (raw === 'user') return 'user';
+
+  return 'user';
+};
+
 const signToken = (user) => {
   return jwt.sign(
-    { id: user._id, role: user.role },
+    { id: user._id, role: normalizeRole(user.role) },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
@@ -30,7 +48,7 @@ const registerUser = async (req, res) => {
       name,
       email: normalizedEmail,
       password,
-      role: role || 'Clerk',
+      role: normalizeRole(role),
     });
 
     const token = signToken(user);
@@ -42,7 +60,7 @@ const registerUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: normalizeRole(user.role),
         createdAt: user.createdAt,
       },
     });
@@ -92,7 +110,7 @@ const loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: normalizeRole(user.role),
         createdAt: user.createdAt,
       },
     });

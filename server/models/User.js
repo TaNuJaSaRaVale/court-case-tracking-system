@@ -29,8 +29,10 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['Admin', 'Lawyer', 'Clerk'],
-      default: 'Clerk',
+      // Keep backward compatibility with legacy stored roles.
+      // New code should use: user | lawyer | admin
+      enum: ['user', 'lawyer', 'admin', 'Admin', 'Lawyer', 'Clerk'],
+      default: 'user',
     },
   },
   {

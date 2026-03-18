@@ -3,6 +3,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 const connectDB = require('./config/db');
+const errorHandler = require('./middleware/errorMiddleware');
+const { startReminderScheduler } = require('./utils/reminderScheduler');
 
 dotenv.config();
 connectDB();
@@ -18,15 +20,26 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const caseRoutes = require('./routes/caseRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const documentRoutes = require('./routes/documentRoutes');
+const lawyerRoutes = require('./routes/lawyerRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cases', caseRoutes);
-
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/lawyers', lawyerRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.use((req, res) => {
   return res.status(404).json({ message: 'Route not found' });
 });
+
+app.use(errorHandler);
+
+startReminderScheduler();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
