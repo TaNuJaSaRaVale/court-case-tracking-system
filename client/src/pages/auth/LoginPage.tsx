@@ -1,27 +1,38 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { court } from "../../assets/index.ts";
+import {checkIt} from "../../services/authService.ts";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const roleParam = params.get("role") || "citizen";
+  const roleParam = params.get("role") || "user";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
   e.preventDefault();
 
-  localStorage.setItem("role", roleParam);
-
-  if (roleParam === "citizen") {
-    navigate("/dashboard/citizen");
-  } else {
-    navigate("/dashboard/lawyer");
+  try{
+    const total = await checkIt(email,password);
+    const data = total.data
+    if (!total.ok) {
+      alert(data.message || "Invalid credentials");
+      return;
+    }
+    const role = (data.user.role==="user"?"citizen":"lawyer")
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role",role)
+    if(role==="citizen"){
+        navigate("/citizen/dashboard")
+    }else{
+        navigate("/lawyer/dashboard")
+    }
+  }catch(err){
+    console.log(err);
+    return;
+  };
   }
-};
-  const role = roleParam.charAt(0).toUpperCase() + roleParam.slice(1);
-
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -48,7 +59,7 @@ export default function LoginPage() {
 
         {/* Title */}
         <h2 className="text-center text-2xl font-semibold text-[#0d1b3e]">
-          Sign in as <span className="text-yellow-600 italic">{role}</span>
+          Sign in as <span className="text-yellow-600 italic">{roleParam}</span>
         </h2>
 
         <p className="text-center text-gray-500 text-sm mt-1">

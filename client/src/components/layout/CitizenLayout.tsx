@@ -29,13 +29,13 @@ export default function CitizenLayout() {
 
             <nav className="flex flex-col gap-2 mt-4">
               <Link
-                to="/dashboard/citizen"
+                to="/citizen/dashboard"
                 className="hover:bg-white/10 p-2 rounded"
               >
                 Dashboard
               </Link>
 
-              <Link to="#" className="hover:bg-white/10 p-2 rounded">
+              <Link to="/citizen/mycases" className="hover:bg-white/10 p-2 rounded">
                 My Cases
               </Link>
 
@@ -54,7 +54,7 @@ export default function CitizenLayout() {
         <button
           onClick={() => {
             localStorage.removeItem("role");
-            window.location.href = "/login";
+            window.location.href = "/";
           }}
           className={`${!isOpen ? "rounded-full m-3":"rounded"} mt-auto bg-red-500 p-2`}
         >
@@ -63,7 +63,7 @@ export default function CitizenLayout() {
       </div>
 
       {/* Main Section */}
-      <div className="flex-1 flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gray-50">
         {/* Topbar */}
         <div className="bg-white shadow px-6 py-3 flex justify-between items-center">
           <h1 className="text-lg font-semibold">Citizen Dashboard</h1>
@@ -71,7 +71,7 @@ export default function CitizenLayout() {
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="max-w-7xl mx-auto p-4 flex-1 overflow-auto">
           <Outlet />
         </div>
       </div>

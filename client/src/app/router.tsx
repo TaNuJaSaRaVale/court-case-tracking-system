@@ -1,8 +1,9 @@
 import {createBrowserRouter} from "react-router-dom"
 import ProtectedRoute from "../components/ProtectedRoute"
-import {LandingPage , LoginPage,RegisterPage,MainLayout,CitizenLayout} from './route'
+import {LandingPage , LoginPage,RegisterPage,MainLayout,CitizenLayout,CaseDetailPage,LawyerLayout} from './route'
 import CitizenDashboard from "../pages/citizen/CitizenDashboard"
 import LawyerDashboard from "../pages/lawyer/LawyerDashboard"
+import ClientPage from "../pages/lawyer/ClientsPage"
 export const router = createBrowserRouter([
     {
       path:'/',
@@ -17,10 +18,14 @@ export const router = createBrowserRouter([
       element:<RegisterPage />
     },
     {
-      path:'/dashboard/lawyer',
-      element:<ProtectedRoute allowedRole="lawyer"><LawyerDashboard /></ProtectedRoute>
+      path:'/citizen',
+      element:<CitizenLayout />,
+      children:[
+        {path:"dashboard",element:<CitizenDashboard />},
+        {path:"mycases",element:<CaseDetailPage />},
+      ]
     },
-
+    
     {
     path: "/",
     element: <MainLayout />,
@@ -31,16 +36,18 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/dashboard/citizen",
+    path: "/lawyer",
     element: (
-      <ProtectedRoute allowedRole="citizen">
-        <CitizenLayout />
+      <ProtectedRoute allowedRole="lawyer">
+        <LawyerLayout />
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <CitizenDashboard /> },
+        {path:"dashboard",element:<LawyerDashboard />},
+        {path:"clientPage",element:<ClientPage />}
     ],
   },
+  
     // {
     //  path:'/citizen',
     //  element:<CitizenLayout />,
