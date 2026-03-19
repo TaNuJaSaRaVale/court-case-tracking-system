@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('../models/User');
 
 const normalizeRole = (roleValue) => {
@@ -6,14 +7,10 @@ const normalizeRole = (roleValue) => {
 
   if (!raw) return 'user';
 
-  // Support legacy role values from earlier iterations
   if (raw === 'admin') return 'admin';
   if (raw === 'lawyer') return 'lawyer';
   if (raw === 'clerk') return 'user';
-
-  // Support capitalized legacy inputs
   if (raw === 'administrator') return 'admin';
-
   if (raw === 'user') return 'user';
 
   return 'user';
@@ -66,7 +63,7 @@ const registerUser = async (req, res) => {
     });
   } catch (err) {
     console.error('Register error:', err);
-    // Duplicate key on email only
+
     if (
       err &&
       err.code === 11000 &&
@@ -74,9 +71,11 @@ const registerUser = async (req, res) => {
     ) {
       return res.status(400).json({ message: 'Email already registered' });
     }
+
     if (err && err.name === 'ValidationError') {
       return res.status(400).json({ message: err.message });
     }
+
     return res.status(500).json({ message: 'Server error' });
   }
 };
@@ -92,11 +91,13 @@ const loginUser = async (req, res) => {
     const normalizedEmail = String(email).toLowerCase().trim();
 
     const user = await User.findOne({ email: normalizedEmail }).select('+password');
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const ok = await user.matchPassword(password);
+
     if (!ok) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -120,4 +121,80 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+//
+// 🔴 FORGOT PASSWORD
+//
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const normalizedEmail = String(email).toLowerCase().trim();
+
+    const user = await User.findOne({ email: normalizedEmail });
+
+    // Do not reveal if user exists
+    if (!user) {
+      return res.status(200).json({
+        message: 'If user exists, reset link sent',
+      });
+    }
+
+    const resetToken = user.createPasswordResetToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+
+    console.log('RESET URL:', resetURL);
+
+    res.status(200).json({
+      message: 'Reset link generated',
+    });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+//
+// 🔴 RESET PASSWORD
+//
+const resetPassword = async (req, res) => {
+  try {
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    }).select('+password');
+
+    if (!user) {
+      return res.status(400).json({
+        message: 'Token invalid or expired',
+      });
+    }
+
+    user.password = req.body.password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Password reset successful',
+    });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  forgotPassword,
+  resetPassword,
+};
