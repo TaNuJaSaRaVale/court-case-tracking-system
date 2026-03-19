@@ -27,8 +27,10 @@ export default function RegisterPage() {
     const role = roleIt==="user"?"citizen":"lawyer"
     localStorage.setItem("role",role)
     localStorage.setItem("token",data.token)
+    localStorage.setItem("email",data.user.email)
+    localStorage.setItem("name",data.user.name)
     alert(data.message)
-    navigate(`/${role}/dashboard`)
+    window.location.href = (`/${role}/dashboard`)
   }
 
 

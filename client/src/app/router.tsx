@@ -1,9 +1,13 @@
 import {createBrowserRouter} from "react-router-dom"
 import ProtectedRoute from "../components/ProtectedRoute"
-import {LandingPage , LoginPage,RegisterPage,MainLayout,CitizenLayout,CaseDetailPage,LawyerLayout} from './route'
+import {LandingPage , LoginPage,RegisterPage,MainLayout,CitizenLayout,LawyerLayout} from './route'
 import CitizenDashboard from "../pages/citizen/CitizenDashboard"
 import LawyerDashboard from "../pages/lawyer/LawyerDashboard"
 import ClientPage from "../pages/lawyer/ClientsPage"
+import NyaySetuDocuments from "../pages/citizen/document"
+import NyayaSetuSettingsApp from "../components/shared/settings"
+import HireLawyerPage from "../pages/citizen/LawyersPage"
+import MyCases from "../pages/citizen/CaseDetailPage"
 export const router = createBrowserRouter([
     {
       path:'/',
@@ -22,7 +26,10 @@ export const router = createBrowserRouter([
       element:<CitizenLayout />,
       children:[
         {path:"dashboard",element:<CitizenDashboard />},
-        {path:"mycases",element:<CaseDetailPage />},
+        {path:"mycases",element:<MyCases />},
+        {path:"documents",element:<NyaySetuDocuments />},
+        {path:"settings",element:<NyayaSetuSettingsApp />},
+        {path:"hirelawyer",element:<HireLawyerPage />},
       ]
     },
     

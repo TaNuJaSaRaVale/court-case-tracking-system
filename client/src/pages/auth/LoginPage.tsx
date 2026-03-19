@@ -10,29 +10,37 @@ export default function LoginPage() {
   const roleParam = params.get("role") || "user";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  try{
-    const total = await checkIt(email,password);
-    const data = total.data
-    if (!total.ok) {
-      alert(data.message || "Invalid credentials");
+  try {
+    const res = await checkIt(email, password);
+
+    console.log("Response:", res);
+
+    if (!res.ok) {
+      alert(res.data.message || "Invalid credentials");
       return;
     }
-    const role = (data.user.role==="user"?"citizen":"lawyer")
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("role",role)
-    if(role==="citizen"){
-        navigate("/citizen/dashboard")
-    }else{
-        navigate("/lawyer/dashboard")
-    }
-  }catch(err){
-    console.log(err);
-    return;
-  };
+
+    const role = res.data.user.role === "user" ? "citizen" : "lawyer";
+
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("role", role);
+    localStorage.setItem("name", res.data.user.name);
+    localStorage.setItem("email", res.data.user.email);
+
+    console.log("Stored token:", localStorage.getItem("role"));
+
+    window.location.href = (role === "citizen"
+      ? "/citizen/dashboard"
+      : "/lawyer/dashboard"
+    );
+
+  } catch (err) {
+    console.error("Login error:", err);
   }
+};
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
 

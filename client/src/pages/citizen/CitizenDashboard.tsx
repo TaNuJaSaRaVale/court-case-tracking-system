@@ -248,6 +248,7 @@ export default function CitizenDashboard() {
         const res = await fetchWithAuth("api/dashboard");
         const data = res.data;
         console.log(data);
+
         if (!res.ok) {
           console.log("Failed to fetch Dashboard");
           return;
@@ -345,7 +346,7 @@ export default function CitizenDashboard() {
 
   return (
     <div
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-6 m-2"
       style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
     >
       {/* ── Welcome Banner ──────────────────────────────────────────────────── */}
@@ -374,7 +375,7 @@ export default function CitizenDashboard() {
               </span>
             </div>
             <h2 className="text-white text-xl sm:text-2xl font-bold leading-snug">
-              Good morning, Citizen
+              Hello, {localStorage.getItem("name")}
             </h2>
             <p className="text-slate-400 text-sm mt-1">
               You have{" "}
