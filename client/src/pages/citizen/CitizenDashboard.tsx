@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchWithAuth } from "../../services/api";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface StatCardProps {
@@ -33,19 +34,23 @@ interface QuickAction {
 
 // ─── SVG Icon Helper ───────────────────────────────────────────────────────────
 const ICONS = {
-  folder:   "M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z",
-  calendar: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-  bell:     "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
-  search:   "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
-  scale:    "M3 6l9-3 9 3M3 6v12l9 3 9-3V6M12 3v18",
-  document: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-  plus:     "M12 4v16m8-8H4",
-  info:     "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-  clock:    "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+  folder:
+    "M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z",
+  calendar:
+    "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+  bell: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
+  search: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
+  scale: "M3 6l9-3 9 3M3 6v12l9 3 9-3V6M12 3v18",
+  document:
+    "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+  plus: "M12 4v16m8-8H4",
+  info: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+  clock: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
   chevronR: "M9 5l7 7-7 7",
-  gavel:    "M3 17l4-4m0 0l4-4m-4 4l4 4m5-9l4-4m0 0l-4-4m4 4H10",
-  x:        "M6 18L18 6M6 6l12 12",
-  shield:   "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+  gavel: "M3 17l4-4m0 0l4-4m-4 4l4 4m5-9l4-4m0 0l-4-4m4 4H10",
+  x: "M6 18L18 6M6 6l12 12",
+  shield:
+    "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
 } as const;
 
 const Icon = ({
@@ -93,7 +98,9 @@ const StatCard = ({
           <Icon d={ICONS[icon]} className={`w-5 h-5 ${accentIcon}`} />
         </div>
         {trend && (
-          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${accentBadge}`}>
+          <span
+            className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${accentBadge}`}
+          >
             {trend}
           </span>
         )}
@@ -113,8 +120,7 @@ const StatCard = ({
         className={`mt-3 flex items-center gap-1 text-[11px] font-semibold ${accentLink}
           opacity-0 group-hover:opacity-100 transition-opacity duration-200`}
       >
-        View details{" "}
-        <Icon d={ICONS.chevronR} className="w-3 h-3" />
+        View details <Icon d={ICONS.chevronR} className="w-3 h-3" />
       </button>
     </div>
   </div>
@@ -122,9 +128,9 @@ const StatCard = ({
 
 // ─── Status badge styles ───────────────────────────────────────────────────────
 const STATUS_STYLES: Record<CaseResult["status"], string> = {
-  Active:  "bg-emerald-50 text-emerald-700 border-emerald-200",
+  Active: "bg-emerald-50 text-emerald-700 border-emerald-200",
   Pending: "bg-amber-50  text-amber-700  border-amber-200",
-  Closed:  "bg-slate-100 text-slate-500  border-slate-200",
+  Closed: "bg-slate-100 text-slate-500  border-slate-200",
   Hearing: "bg-blue-50   text-blue-700   border-blue-200",
 };
 
@@ -171,99 +177,148 @@ const CaseRow = ({ caseNum, title, court, date, status }: CaseResult) => (
 const MOCK_RESULTS: CaseResult[] = [
   {
     caseNum: "CIV/2024/00412",
-    title:   "Property Dispute — Sharma vs. State",
-    court:   "District Court, Delhi",
-    date:    "18 Mar 2025",
-    status:  "Active",
+    title: "Property Dispute — Sharma vs. State",
+    court: "District Court, Delhi",
+    date: "18 Mar 2025",
+    status: "Active",
   },
   {
     caseNum: "CRM/2024/01893",
-    title:   "Appeal — Kumar & Anr vs. Respondent",
-    court:   "High Court, Mumbai",
-    date:    "22 Apr 2025",
-    status:  "Hearing",
+    title: "Appeal — Kumar & Anr vs. Respondent",
+    court: "High Court, Mumbai",
+    date: "22 Apr 2025",
+    status: "Hearing",
   },
   {
     caseNum: "CIV/2023/00091",
-    title:   "Succession Petition — Estate Matter",
-    court:   "Family Court, Bengaluru",
-    date:    "05 Jan 2024",
-    status:  "Closed",
+    title: "Succession Petition — Estate Matter",
+    court: "Family Court, Bengaluru",
+    date: "05 Jan 2024",
+    status: "Closed",
   },
 ];
 
-const STATS: StatCardProps[] = [
-  {
-    icon:        "folder",
-    label:       "Total Cases",
-    value:       "3",
-    accentBar:   "bg-[#0c1631]",
-    accentBg:    "bg-[#0c1631]/[0.07]",
-    accentIcon:  "text-[#0c1631]",
-    accentBadge: "bg-slate-100 text-slate-600",
-    accentLink:  "text-slate-500",
-    delay:       "0ms",
-  },
-  {
-    icon:        "calendar",
-    label:       "Upcoming Hearings",
-    value:       "1",
-    accentBar:   "bg-amber-400",
-    accentBg:    "bg-amber-50",
-    accentIcon:  "text-amber-600",
-    accentBadge: "bg-amber-50 text-amber-600 border border-amber-200",
-    accentLink:  "text-amber-600",
-    trend:       "Soon",
-    delay:       "60ms",
-  },
-  {
-    icon:        "bell",
-    label:       "Notifications",
-    value:       "4",
-    accentBar:   "bg-emerald-500",
-    accentBg:    "bg-emerald-50",
-    accentIcon:  "text-emerald-600",
-    accentBadge: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    accentLink:  "text-emerald-600",
-    trend:       "New",
-    delay:       "120ms",
-  },
-];
 
 const QUICK_ACTIONS: QuickAction[] = [
   {
-    icon:       "document",
-    label:      "File a New Case",
-    sub:        "Submit petition online",
-    border:     "border-[#0c1631]/20 hover:border-[#0c1631]/40 hover:bg-[#0c1631]/[0.03]",
-    iconBg:     "bg-[#0c1631]/[0.06]",
-    iconColor:  "text-[#0c1631]",
+    icon: "document",
+    label: "File a New Case",
+    sub: "Submit petition online",
+    border:
+      "border-[#0c1631]/20 hover:border-[#0c1631]/40 hover:bg-[#0c1631]/[0.03]",
+    iconBg: "bg-[#0c1631]/[0.06]",
+    iconColor: "text-[#0c1631]",
   },
   {
-    icon:       "calendar",
-    label:      "Hearing Schedule",
-    sub:        "View upcoming dates",
-    border:     "border-amber-200 hover:border-amber-300 hover:bg-amber-50/40",
-    iconBg:     "bg-amber-50",
-    iconColor:  "text-amber-600",
+    icon: "calendar",
+    label: "Hearing Schedule",
+    sub: "View upcoming dates",
+    border: "border-amber-200 hover:border-amber-300 hover:bg-amber-50/40",
+    iconBg: "bg-amber-50",
+    iconColor: "text-amber-600",
   },
   {
-    icon:       "gavel",
-    label:      "Case Status Update",
-    sub:        "Check latest orders",
-    border:     "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80",
-    iconBg:     "bg-slate-100",
-    iconColor:  "text-slate-600",
+    icon: "gavel",
+    label: "Case Status Update",
+    sub: "Check latest orders",
+    border: "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80",
+    iconBg: "bg-slate-100",
+    iconColor: "text-slate-600",
   },
 ];
 
-const SEARCH_TAGS = ["Case Number", "Petitioner Name", "Respondent Name", "FIR Number"] as const;
+const SEARCH_TAGS = [
+  "Case Number",
+  "Petitioner Name",
+  "Respondent Name",
+  "FIR Number",
+] as const;
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function CitizenDashboard() {
-  const [query, setQuery]       = useState<string>("");
+  const [stats1, setStats1] = useState({
+    totalCases: 0,
+    openCases: 0,
+    closedCases: 0,
+    upcomingHearings: 0,
+  });
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await fetchWithAuth("api/dashboard");
+        const data = res.data;
+        console.log(data);
+        if (!res.ok) {
+          console.log("Failed to fetch Dashboard");
+          return;
+        }
+        setStats1(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getData();
+  }, []);
+  const STATS: StatCardProps[] = [
+  {
+    icon: "folder",
+    label: "Total Cases",
+    value: `${stats1.totalCases}`,
+    accentBar: "bg-[#0c1631]",
+    accentBg: "bg-[#0c1631]/[0.07]",
+    accentIcon: "text-[#0c1631]",
+    accentBadge: "bg-slate-100 text-slate-600",
+    accentLink: "text-slate-500",
+    delay: "0ms",
+  },
+  {
+    icon: "calendar",
+    label: "Upcoming Hearings",
+    value: `${stats1.upcomingHearings}`,
+    accentBar: "bg-amber-400",
+    accentBg: "bg-amber-50",
+    accentIcon: "text-amber-600",
+    accentBadge: "bg-amber-50 text-amber-600 border border-amber-200",
+    accentLink: "text-amber-600",
+    trend: "Soon",
+    delay: "60ms",
+  },
+  {
+    icon: "bell",
+    label: "Notifications",
+    value: "4",
+    accentBar: "bg-emerald-500",
+    accentBg: "bg-emerald-50",
+    accentIcon: "text-emerald-600",
+    accentBadge: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    accentLink: "text-emerald-600",
+    trend: "New",
+    delay: "120ms",
+  },
+];
+
+  const [query, setQuery] = useState<string>("");
   const [searched, setSearched] = useState<boolean>(false);
-  const [loading, setLoading]   = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [notifications,setNotify] = useState([])
+
+  useEffect(()=>{
+    const getNotify = async()=>{
+        try{
+        const res = await fetchWithAuth('api/notifications')
+        const data =  res.data
+        if(!res.ok){
+            console.log("Error While finding notification")
+            return
+        }
+        console.log(data)
+        setNotify(data)
+    }catch(err){
+        console.log(err)
+    }
+    } 
+    getNotify()
+  },[])
 
   const handleSearch = (): void => {
     if (!query.trim()) return;
@@ -323,8 +378,14 @@ export default function CitizenDashboard() {
             </h2>
             <p className="text-slate-400 text-sm mt-1">
               You have{" "}
-              <span className="text-amber-300 font-semibold">1 upcoming hearing</span> and{" "}
-              <span className="text-amber-300 font-semibold">4 new notifications</span> today.
+              <span className="text-amber-300 font-semibold">
+                {stats1.upcomingHearings} upcoming hearing
+              </span>{" "}
+              and{" "}
+              <span className="text-amber-300 font-semibold">
+                4 new notifications
+              </span>{" "}
+              today.
             </p>
           </div>
 
@@ -337,7 +398,9 @@ export default function CitizenDashboard() {
             </div>
             <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/[0.15] border border-emerald-500/[0.25]">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[11px] text-emerald-300 font-semibold">Portal Active</span>
+              <span className="text-[11px] text-emerald-300 font-semibold">
+                Portal Active
+              </span>
             </div>
           </div>
         </div>
@@ -362,7 +425,9 @@ export default function CitizenDashboard() {
               <Icon d={ICONS.search} className="w-4 h-4 text-[#0c1631]" />
             </div>
             <div>
-              <h2 className="text-slate-800 font-bold text-base">Case Lookup</h2>
+              <h2 className="text-slate-800 font-bold text-base">
+                Case Lookup
+              </h2>
               <p className="text-slate-400 text-[11px] mt-0.5">
                 Search by case number, party name, or court reference
               </p>
@@ -450,7 +515,8 @@ export default function CitizenDashboard() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-[12px] font-semibold text-slate-500 uppercase tracking-wide">
-                  {MOCK_RESULTS.length} result{MOCK_RESULTS.length !== 1 ? "s" : ""} found
+                  {MOCK_RESULTS.length} result
+                  {MOCK_RESULTS.length !== 1 ? "s" : ""} found
                 </p>
                 <button className="text-[11px] text-amber-600 hover:text-amber-700 font-semibold transition-colors">
                   Export results
@@ -477,8 +543,8 @@ export default function CitizenDashboard() {
                 No Cases Found
               </p>
               <p className="text-slate-400 text-xs mt-1.5 max-w-xs leading-relaxed">
-                Enter a case number, party name, or court reference above to search the judicial
-                records database.
+                Enter a case number, party name, or court reference above to
+                search the judicial records database.
               </p>
               <button
                 onClick={() => setQuery("CIV/2024/")}
@@ -509,7 +575,9 @@ export default function CitizenDashboard() {
               <Icon d={ICONS[a.icon]} className={`w-5 h-5 ${a.iconColor}`} />
             </div>
             <div className="min-w-0">
-              <p className="text-slate-800 text-sm font-bold leading-tight truncate">{a.label}</p>
+              <p className="text-slate-800 text-sm font-bold leading-tight truncate">
+                {a.label}
+              </p>
               <p className="text-slate-400 text-[11px] mt-0.5">{a.sub}</p>
             </div>
             <Icon
@@ -526,11 +594,14 @@ export default function CitizenDashboard() {
           <Icon d={ICONS.info} className="w-4 h-4 text-amber-600" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-amber-800">Important Notice</p>
+          <p className="text-sm font-semibold text-amber-800">
+            Important Notice
+          </p>
           <p className="text-amber-700/80 text-xs mt-0.5 leading-relaxed">
-            All information displayed on this portal is sourced from official court records. For
-            legal assistance, please consult a registered advocate. Unauthorised access or misuse is
-            a punishable offence under the IT Act, 2000.
+            All information displayed on this portal is sourced from official
+            court records. For legal assistance, please consult a registered
+            advocate. Unauthorised access or misuse is a punishable offence
+            under the IT Act, 2000.
           </p>
         </div>
       </div>

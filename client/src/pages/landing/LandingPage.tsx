@@ -30,7 +30,7 @@ export default function LandingPage() {
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mt-6">
-            <Link to="/login?role=citizen">
+            <Link to="/login?role=user">
               <div className="border border-blue-900 flex gap-2 rounded-2xl items-center px-4 py-2">
                 <img src={citizen} className="w-6" />
                 <p className="text-white">I'm a Citizen</p>

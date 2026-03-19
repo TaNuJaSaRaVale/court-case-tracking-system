@@ -1,31 +1,36 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import {court} from "../../assets/index.ts";
+import { Link, useLocation,useNavigate } from "react-router-dom";
+import {citizen, court} from "../../assets/index.ts";
+import { register } from "../../services/authService.ts";
 
 
 export default function RegisterPage() {
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const roleParam = params.get("role") || "citizen";
+  const navigate = useNavigate()
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
   const [name,setName] = useState("")
-  const role =
-    roleParam.charAt(0).toUpperCase() + roleParam.slice(1);
+  const [roleParam,setRoleParam] = useState("")
 
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e:React.FormEvent) =>{
+  const handleSubmit = async (e:React.FormEvent) =>{
     e.preventDefault();
-    console.log({email,password,role,name})
+    const total = await register(name,email,password,roleParam)
+    const data = total.data
+
+    if(!total.ok){
+        alert("Registration Failed")
+        return;
+    }
+    const roleIt = roleParam.toLowerCase().trim()
+    const role = roleIt==="user"?"citizen":"lawyer"
+    localStorage.setItem("role",role)
+    localStorage.setItem("token",data.token)
+    alert(data.message)
+    navigate(`/${role}/dashboard`)
   }
 
-//   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     setTimeout(() => setLoading(false), 2000);
-//   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0d1b3e] px-4 relative overflow-hidden">
@@ -46,7 +51,7 @@ export default function RegisterPage() {
 
         {/* Title */}
         <h2 className="text-center text-2xl font-semibold text-[#0d1b3e]">
-          Register as <span className="text-yellow-600 italic">{role}</span>
+          Register as <span className="text-yellow-600 italic">{roleParam}</span>
         </h2>
 
         <p className="text-center text-gray-500 text-sm mt-1">
@@ -85,6 +90,19 @@ export default function RegisterPage() {
               required
             />
           </div>
+          {/* Role */}
+          <div>
+            <label className="text-xs font-medium text-[#0d1b3e] uppercase tracking-wide">
+              Role
+            </label>
+            <input
+              type="text"
+              placeholder="User/Lawyer"
+              onChange={(e)=>setRoleParam(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
 
           {/* Password */}
           <div>
@@ -108,6 +126,7 @@ export default function RegisterPage() {
               </button>
             </div>
           </div>
+
 
           {/* Confirm Password */}
           <div>
