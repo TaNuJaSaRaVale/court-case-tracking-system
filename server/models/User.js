@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema(
   {
-    // Added to satisfy existing unique index on `username` in the database.
-    // Value is auto-generated in pre-save to avoid duplicate key errors.
     username: {
       type: String,
       trim: true,
@@ -29,11 +28,13 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      // Keep backward compatibility with legacy stored roles.
-      // New code should use: user | lawyer | admin
       enum: ['user', 'lawyer', 'admin', 'Admin', 'Lawyer', 'Clerk'],
       default: 'user',
     },
+
+    // ✅ NEW FIELDS FOR FORGOT PASSWORD
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   {
     timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
@@ -41,21 +42,36 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre('save', async function () {
-  // Ensure password is hashed
+  // Hash password
   if (this.isModified('password')) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
 
-  // Ensure username is populated and unique-ish to satisfy existing unique index
+  // Auto-generate username if missing
   if (!this.username) {
     const base = (this.email || '').split('@')[0] || 'user';
     this.username = `${base}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   }
 });
 
+// Compare password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password);
+};
+
+// ✅ CREATE RESET TOKEN METHOD
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.passwordResetExpires = Date.now() + 15 * 60 * 1000; // 15 min
+
+  return resetToken;
 };
 
 module.exports = mongoose.model('User', userSchema);
