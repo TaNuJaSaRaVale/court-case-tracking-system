@@ -1,21 +1,46 @@
 import {createBrowserRouter} from "react-router-dom"
-
-import LandingPage from "C:\\Projects\\hackathons\\court-case-tracker\\court-case-tracking-system\\client\\src\\pages\\landing\\LandingPage.tsx"
-// import LoginPage from "C:\\Projects\\hackathons\\court-case-tracker\\court-case-tracking-system\\client\\src\\pages\\auth\\LoginPage.tsx"
-// import CitizenDashboard from "C:\\Projects\\hackathons\\court-case-tracker\\court-case-tracking-system\\client\\src\\pages\\citizen\\CitizenDashboard.tsx"
-// import LawyersPage from "C:\\Projects\\hackathons\\court-case-tracker\\court-case-tracking-system\\client\\src\\pages\\citizen\\LawyersPage.tsx"
-// import CitizenLayout from "C:\\Projects\\hackathons\\court-case-tracker\\court-case-tracking-system\\client\\src\\components\\layout\\CitizenLayout.tsx"
-// import CaseSearchPage from "C:\\Projects\\hackathons\\court-case-tracker\\court-case-tracking-system\\client\\src\\pages\\citizen\\CaseSearchPage.tsx"
-
+import ProtectedRoute from "../components/ProtectedRoute"
+import {LandingPage , LoginPage,RegisterPage,MainLayout,CitizenLayout} from './route'
+import CitizenDashboard from "../pages/citizen/CitizenDashboard"
+import LawyerDashboard from "../pages/lawyer/LawyerDashboard"
 export const router = createBrowserRouter([
     {
       path:'/',
       element:<LandingPage />
     },
-    // { 
-    //   path:'/login',
-    //   element:<LoginPage />
-    // },
+    { 
+      path:'/login',
+      element:<LoginPage />
+    },
+    {
+      path:'/register',
+      element:<RegisterPage />
+    },
+    {
+      path:'/dashboard/lawyer',
+      element:<ProtectedRoute allowedRole="lawyer"><LawyerDashboard /></ProtectedRoute>
+    },
+
+    {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      { index: true, element: <LandingPage /> },
+      { path: "login", element: <LoginPage /> },
+      { path: "register", element: <RegisterPage /> },
+    ],
+  },
+  {
+    path: "/dashboard/citizen",
+    element: (
+      <ProtectedRoute allowedRole="citizen">
+        <CitizenLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <CitizenDashboard /> },
+    ],
+  },
     // {
     //  path:'/citizen',
     //  element:<CitizenLayout />,
