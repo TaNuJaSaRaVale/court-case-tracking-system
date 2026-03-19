@@ -1,4 +1,5 @@
 import './App.css'
+import { Badge } from './components/ui/Badge'
 
 function App() {
   return (
@@ -6,6 +7,10 @@ function App() {
       <h1 className="text-5xl font-bold text-blue-500">
         NyaySetu
       </h1>
+      <Badge label="Filed" variant="info" />
+      <Badge label="Judgment" variant="success" />
+      <Badge label="Today – Critical" variant="critical" />
+      <Badge label="Pending" variant="neutral" />
     </div>
   )
 }
