@@ -87,6 +87,7 @@ Create `server/.env` (or update it) with:
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/courtcase
 JWT_SECRET=supersecret
+REMINDER_CRON=0 * * * *
 ```
 
 ### 3) Start the server
@@ -176,6 +177,9 @@ Important runtime note:
 ### 3) Notification (`models/Notification.js`)
 
 - `user: ObjectId(ref User)` (required)
+- `type` (String, default `general`)
+- `case: ObjectId(ref Case)` (optional, used for hearing reminders)
+- `scheduledFor` (Date, optional, used for hearing reminders)
 - `message` (required)
 - `read` (boolean, default false)
 - `createdAt` (timestamps)
@@ -222,12 +226,30 @@ Automatically logs:
 
 **File**: `utils/reminderScheduler.js`
 
-Every hour:
+Schedule:
+- Defaults to every hour (`0 * * * *`)
+- Can be configured with `REMINDER_CRON` in `.env`
+
+Behavior (every run):
 - Query cases with `nextHearingDate` within the next 24 hours
 - For statuses: `Hearing Scheduled` and `In Progress`
-- Create `Notification` records for the case owner
+- Create a `Notification` for the case owner with:
+  - `type: hearing_reminder`
+  - `case: <Case _id>`
+  - `scheduledFor: <nextHearingDate>`
+  - `message: ...`
+- De-duplicates reminders per `(user, case, scheduledFor)` to avoid spamming
 
 This is a database-based “reminder trigger”. (Actual delivery like email/SMS can be integrated later.)
+
+Testing tip (manual one-shot run):
+- The scheduler exports a one-shot function `runReminderCheck()` which can be executed for testing without waiting an hour.
+
+Example (PowerShell / bash):
+
+```bash
+node -e "require('dotenv').config(); require('./config/db')().then(async ()=>{ await require('./utils/reminderScheduler').runReminderCheck(); console.log('runReminderCheck complete'); process.exit(0); }).catch(e=>{ console.error(e); process.exit(1); });"
+```
 
 ---
 
