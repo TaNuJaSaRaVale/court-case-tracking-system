@@ -1,6 +1,6 @@
 import {createBrowserRouter} from "react-router-dom"
 import ProtectedRoute from "../components/ProtectedRoute"
-import {LandingPage , LoginPage,RegisterPage,MainLayout,CitizenLayout,LawyerLayout} from './route'
+import {LandingPage , LoginPage,RegisterPage,MainLayout,CitizenLayout,LawyerLayout, CaseSearchPage} from './route'
 import CitizenDashboard from "../pages/citizen/CitizenDashboard"
 import LawyerDashboard from "../pages/lawyer/LawyerDashboard"
 import ClientPage from "../pages/lawyer/ClientsPage"
@@ -30,6 +30,7 @@ export const router = createBrowserRouter([
         {path:"documents",element:<NyaySetuDocuments />},
         {path:"settings",element:<NyayaSetuSettingsApp />},
         {path:"hirelawyer",element:<HireLawyerPage />},
+        {path:"understandCase",element:<CaseSearchPage />},
       ]
     },
     

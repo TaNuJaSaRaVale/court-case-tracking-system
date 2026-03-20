@@ -7,6 +7,6 @@ import MainLayout from "../components/layout/MainLayout"
 import CitizenLayout from "../components/layout/CitizenLayout"
 import LawyerLayout from "../components/layout/LawyerLayout"
 import CaseDetailPage from "../pages/citizen/CaseDetailPage"
-// import CaseSearchPage from "../pages/citizen/CaseSearchPage"
+import CaseSearchPage from "../pages/citizen/CaseSearchPage"
 
-export {LandingPage , LoginPage ,RegisterPage, MainLayout,CitizenLayout,CaseDetailPage,LawyerLayout}
+export {LandingPage , LoginPage ,RegisterPage, MainLayout,CitizenLayout,CaseDetailPage,LawyerLayout,CaseSearchPage}

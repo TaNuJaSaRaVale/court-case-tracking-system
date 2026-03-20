@@ -47,6 +47,10 @@ export default function CitizenLayout() {
                 Hire Lawyer
               </Link>
 
+              <Link to="/citizen/understandCase" className="hover:bg-white/10 p-2 rounded">
+                Understand Case
+              </Link>
+
               <Link to="/citizen/settings" className="hover:bg-white/10 p-2 rounded">
                 Settings
               </Link>
