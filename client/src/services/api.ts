@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/'
+const BASE_URL = 'https://court-case-tracking-system.onrender.com/'
 
 export const fetchWithAuth = async(endpoint:string)=>{
     const token = localStorage.getItem("token")

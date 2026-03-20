@@ -1,5 +1,5 @@
 export  async function checkIt(email:string,password:string){
-    const res = await fetch("http://localhost:5000/api/auth/login",{
+    const res = await fetch("https://court-case-tracking-system.onrender.com/api/auth/login",{
         method:'POST',
         headers:{
         "Content-Type": "application/json",
