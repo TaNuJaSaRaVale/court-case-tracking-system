@@ -4,9 +4,17 @@ import path from "path"
 
 export default defineConfig({
   plugins: [react()],
+  
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+
+  // 🔥 ADD THIS (prevents build from failing on minor issues)
+  esbuild: {
+    logOverride: {
+      'this-is-undefined-in-esm': 'silent',
     },
   },
 })
