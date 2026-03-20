@@ -109,7 +109,6 @@ export default function NyaySetuDocuments() {
     const matchDate   = !filterDate  || d.uploadDate >= filterDate;
     return matchSearch && matchCase && matchType && matchStatus && matchDate;
   });
-  const [isLoading,setIsLoading] = useState(true)
 
   const stats = {
     total:    docs.length,
@@ -198,6 +197,8 @@ export default function NyaySetuDocuments() {
     }),
     emptyState: { textAlign:"center" as const, padding:"60px 20px", color:"#9ca3af", fontFamily:"'DM Sans', sans-serif" },
   };
+  const [data1,setData1] = useState([])
+  let [length1,setLength1] = useState(2)
 
   const navItems = [
     { icon:"🏛️", label:"Dashboard" },
@@ -218,10 +219,12 @@ export default function NyaySetuDocuments() {
       body:JSON.stringify({
         caseType,
       })
+
     })
-    const data =  res.json()
-    console.log(localStorage.getItem("token"))
-    console.log(data)
+
+    const data = await res.json()
+    setData1(data.documents)
+    setLength1(data1.length)
   }
   return (
     <>
@@ -459,10 +462,13 @@ export default function NyaySetuDocuments() {
             <div className="flex m-1 gap-2">
               <label htmlFor="caseType">Enter the case Type</label>
               <input type="caseType" onChange={(e)=>{setCaseType(e.target.value)}} placeholder="Case Domain"/>
-              <button onClick={handleSubmit} type="submit" className="bg-blue-900 text-[rgb(255,255,255)] b-[1px] p-2 rounded-3xl">Submit</button>
+              <button onClick={()=>{
+                handleSubmit()
+              }
+                }  type="submit" className="bg-blue-900 text-[rgb(255,255,255)] b-[1px] p-2 rounded-3xl">Submit</button>
             </div>
             <div className="grid grid-cols-1 border-[1px] border-black w-full h-full">
-                Hi
+                <p>{data1}</p>
             </div>
             </div>
           )}
