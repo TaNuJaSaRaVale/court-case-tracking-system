@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-
+import { Link } from "react-router-dom";
+import { fetchWithAuth } from "../../services/api";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type DocType = "FIR" | "Order" | "Evidence" | "Petition" | "Affidavit";
@@ -80,6 +81,7 @@ const DocTypeIcon = ({ type }: { type: DocType }) => {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function NyaySetuDocuments() {
+  const [caseType,setCaseType] = useState("")
   const [docs, setDocs] = useState<Document[]>(MOCK_DOCS);
   const [search, setSearch] = useState("");
   const [filterCase, setFilterCase] = useState("All");
@@ -91,7 +93,7 @@ export default function NyaySetuDocuments() {
   const [uploadCaseId, setUploadCaseId] = useState("");
   const [uploadDocType, setUploadDocType] = useState<DocType>("FIR");
   const [uploadDesc, setUploadDesc] = useState("");
-  const [activeTab, setActiveTab] = useState<"list" | "upload">("list");
+  const [activeTab, setActiveTab] = useState<"list" | "upload"|"reccomend">("list");
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   const [downloadRestrictions, setDownloadRestrictions] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -205,6 +207,19 @@ export default function NyaySetuDocuments() {
     { icon:"⚙️", label:"Settings" },
   ];
 
+  const handleSubmit = async()=>{
+    const res = await fetch("http://localhost:5000/api/ai/recommend-documents",{
+      method:"POST",
+      headers:{
+       "Content-Type":"application/json",
+      },
+      body:JSON.stringify({
+        caseType,
+      })
+    })
+    const data =  res.json
+    console.log(data)
+  }
   return (
     <>
       <style>{`
@@ -258,6 +273,7 @@ export default function NyaySetuDocuments() {
           <div style={S.tabRow}>
             <button style={S.tab(activeTab==="list")} onClick={() => setActiveTab("list")}>📄 Document List</button>
             <button style={S.tab(activeTab==="upload")} onClick={() => setActiveTab("upload")}>📤 Upload Document</button>
+            <button style={S.tab(activeTab==="reccomend")} onClick={() => setActiveTab("reccomend")}>📤 Recommend Documents</button>
           </div>
 
           {activeTab === "list" && (
@@ -433,6 +449,13 @@ export default function NyaySetuDocuments() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+          {activeTab==="reccomend" && (
+            <div className="flex m-1 gap-2">
+              <label htmlFor="caseType">Enter the case Type</label>
+              <input type="caseType" onChange={(e)=>{setCaseType(e.target.value)}} placeholder="Case Domain"/>
+              <button onClick={handleSubmit} type="submit" className="bg-blue-900 text-[rgb(255,255,255)] b-[1px] p-2 rounded-3xl">Submit</button>
             </div>
           )}
 
