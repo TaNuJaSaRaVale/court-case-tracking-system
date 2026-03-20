@@ -109,6 +109,7 @@ export default function NyaySetuDocuments() {
     const matchDate   = !filterDate  || d.uploadDate >= filterDate;
     return matchSearch && matchCase && matchType && matchStatus && matchDate;
   });
+  const [isLoading,setIsLoading] = useState(true)
 
   const stats = {
     total:    docs.length,
@@ -454,10 +455,15 @@ export default function NyaySetuDocuments() {
             </div>
           )}
           {activeTab==="reccomend" && (
+            <div className="flex flex-col">
             <div className="flex m-1 gap-2">
               <label htmlFor="caseType">Enter the case Type</label>
               <input type="caseType" onChange={(e)=>{setCaseType(e.target.value)}} placeholder="Case Domain"/>
               <button onClick={handleSubmit} type="submit" className="bg-blue-900 text-[rgb(255,255,255)] b-[1px] p-2 rounded-3xl">Submit</button>
+            </div>
+            <div className="grid grid-cols-1 border-[1px] border-black w-full h-full">
+                Hi
+            </div>
             </div>
           )}
 

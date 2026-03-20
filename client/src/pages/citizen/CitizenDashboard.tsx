@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchWithAuth } from "../../services/api";
+import { Link } from "react-router-dom";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface StatCardProps {
@@ -120,7 +121,7 @@ const StatCard = ({
         className={`mt-3 flex items-center gap-1 text-[11px] font-semibold ${accentLink}
           opacity-0 group-hover:opacity-100 transition-opacity duration-200`}
       >
-        View details <Icon d={ICONS.chevronR} className="w-3 h-3" />
+        <Link to={label==="Total Cases"?'/citizen/mycases':'/citizen/dashboard'}>View details</Link> <Icon d={ICONS.chevronR} className="w-3 h-3" />
       </button>
     </div>
   </div>
