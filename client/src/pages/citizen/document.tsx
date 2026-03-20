@@ -210,7 +210,7 @@ export default function NyaySetuDocuments() {
   ];
 
   const handleSubmit = async()=>{
-    const res = await fetch("http://localhost:5000/api/ai/recommend-documents",{
+    const res = await fetch("https://court-case-tracking-system.onrender.com/api/ai/recommend-documents",{
       method:"POST",
       headers:{
        "Content-Type":"application/json",

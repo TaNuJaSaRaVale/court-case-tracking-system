@@ -16,7 +16,7 @@ export  async function checkIt(email:string,password:string){
     }
 }
 export async function register(name:string,email:string,password:string,role:string) {
-    const res = await fetch("http://localhost:5000/api/auth/register",{
+    const res = await fetch("https://court-case-tracking-system.onrender.com/api/auth/register",{
         method:'POST',
         headers:{
             "Content-type":"application/json",
