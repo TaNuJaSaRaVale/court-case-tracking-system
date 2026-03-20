@@ -212,12 +212,14 @@ export default function NyaySetuDocuments() {
       method:"POST",
       headers:{
        "Content-Type":"application/json",
+       Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body:JSON.stringify({
         caseType,
       })
     })
-    const data =  res.json
+    const data =  res.json()
+    console.log(localStorage.getItem("token"))
     console.log(data)
   }
   return (
